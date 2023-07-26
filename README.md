@@ -1,6 +1,8 @@
 Para a versão em português, [clique aqui](#the-assembly-gauntlet-português)
 # The-Assembly-Gauntlet
-Project made for the University of Brasília, Computer Science, Intruduction to Computer Systems 
+Project made for the University of Brasília, Computer Science, Intruduction to Computer Systems
+
+By Luca Megiorin, Eduardo Pereira and Manuella Araujo
 - [Context](#context)
 - [Methodology](#methodology)
 - [Conclusion](#conclusion)
