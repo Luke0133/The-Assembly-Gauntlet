@@ -4,7 +4,7 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 - [Methodology](#methodology)
 
 
-[click me](https://github.com/Luke0133/The-Assembly-Gauntlet/blob/ceed42abb171b5a6e2e5b973f15673b7a10c74a6/README.md?plain=1#L49)
+[click me](every-line-printed.-The-code-turned-out-to-be-like-this:)
 
 
 # Context
@@ -44,8 +44,8 @@ would need to move in tilesets, but we didn't want that. So we developed a logic
 section of a larger image in order to print it where the player previously was. The same logic used for 
 printing into an specific coordinate from the bitmap display was used for the image address. The program would 
 recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * Y), 
-and, in the printing loop, it would also be adding 320 - the width of the player to the image address for every 
-line printed. The code turned out to be like this:
+and, in the printing loop, it would also be adding 320 - the width of the player to the image address for 
+every line printed. The code turned out to be like this:
 ```
 ##########################     RENDER IMAGE    ##########################
 #     -----------           argument registers           -----------    #
