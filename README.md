@@ -362,12 +362,12 @@ Gauntlet (1985 - Atari) é um jogo arcade de fantasia estilo hack-and-slash dese
 - [Interface com Teclado](#interface-com-teclado) (Keyboard and Display MMIO simulator);
 - [Interface de áudio, música e efeitos sonoros](#interface-de-audio);
 - [Animação e movimentação do jogador e seus ataques](#movimentação-e-animção-do-jogador);
-- [Colisão](#colisões) com [paredes](#colisão-estática) e com [inimigos](#dynamic-colision);
-- [System for opening doors with keys collected](#dynamic-colision);
-- [Condition for winning levels](#static-colision) or [failing them (losing due to lack of life points)](#players-death);
-- [At least two types of enemies that move and attack the player](#enemies);
-- [At least 3 levels with different layouts](#art-direction-level-design-and-menu);
-- [Menu with score, level and player's health](#art-direction-level-design-and-menu);
+- [Colisão](#colisões) com [paredes](#colisão-estática) e com [inimigos](#colisão-dinâmica);
+- [Sistema de coleta de chaves e abertura de portas](#colisão-dinâmica);
+- [Condição de vitória em uma fase](#colisão-estática) e [de derrota (em razão de zerar a vida ou acabar o tempo)](#morte-do-jogador);
+- [Pelo menos dois tipos de inimigos que andam e atacam o jogador](#inimigos);
+- [Pelo menos 3 layouts de mapas](#diração-artística-design-dos-níveis-e-do-menu);
+- [Menu com score, nível e vida do jogador](#diração-artística-design-dos-níveis-e-do-menu);
 
 
 # Metodologia
