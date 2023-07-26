@@ -4,7 +4,7 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 - [Methodology](#methodology)
 
 
-
+[click me](https://github.com/Luke0133/The-Assembly-Gauntlet/blob/ceed42abb171b5a6e2e5b973f15673b7a10c74a6/README.md?plain=1#L49)
 
 
 # Context
