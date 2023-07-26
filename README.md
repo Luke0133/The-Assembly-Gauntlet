@@ -1,9 +1,9 @@
+Para a versão em português, [clique aqui](#the-assembly-gauntlet-português)
 # The-Assembly-Gauntlet
 Project made for the University of Brasília, Computer Science, Intruduction to Computer Systems 
 - [Context](#context)
 - [Methodology](#methodology)
-
-
+- [Conclusion](#conclusion)
 
 # Context
 Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main objective was to implement the following:
@@ -16,7 +16,7 @@ Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and 
 - [Condition for winning levels](#static-colision) or [failing them (losing due to lack of life points)](#players-death);
 - [At least two types of enemies that move and attack the player](#enemies);
 - [At least 3 levels with different layouts](#art-direction-level-design-and-menu);
-- Menu with score, level and player's health;
+- [Menu with score, level and player's health](#art-direction-level-design-and-menu);
 
 
 # Methodology
@@ -271,9 +271,29 @@ until printing height (240) is achieved
 
 
 ## Art direction, level design and menu
+The sprites were made with [krita](https://krita.org/en/) and the menu was also put into the level map images. The information available in the menu info is updated according to the time/damage player has (shown as health), the ammount of score player has (gained by killing enemies and collecting keys or chests), and depending on how many digits there are, the numbers will be rendered centered in the menu. As for the Main Menu and Game Over menu, a simple counter that stores the option being selected indicates where the selection arrows should be rendered
+
+![Game screenshot](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/02176585-cc33-42c6-8e4b-bac932f896dc)
+
+![Game menus](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/fef23cc7-0b3a-4fba-a1ec-d9872693728d)
+
+## Final Observations
+### 12-bit Limit Range
+Branches have a 12-bit limit range. In order to avoid this (do it since the beggining of the code) do:
+```
+# instead of doing:
+beq t1,t2,label
+	# code
+label:
+
+# invert the logic and do:
+bne t1,t2,skip_label
+j label
+skip_label:
+```
 
 ### About Macros
-I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
+I should say this now already: macros are a ***bad idea***. We used them based on old projects, but there are 
 some important things that newcomers like us need to know about them: Macros arent like high-level languages' 
 functions. They litteraly write the code put into them every time they are called, so in a case like this:
 ```
@@ -309,11 +329,17 @@ bne t1,t0,SKIP_D
 j  MOV_LEFT
 SKIP_D:
 ```
-so make sure that your codes used in macros arent too long, otherwise, you may fall victim to the 12-bit 
-branch limit range exceeded very very quickly. ***If*** you are to use this, make sure to remember this, but
+so make sure that your codes used in macros arent too long, otherwise, you may fall victim to the [12-bit 
+branch limit range](#12-bit-limit-range) exceeded very very quickly. ***If*** you are to use this, make sure to remember this, but
 if you are new to Assembly and can avoid it, do it (don't make the same mistake as we did)
 
 ### MIDI Converter Usage
 - You need to have python and mido installed `py -m pip install mido` for windows powershell or `pip install mido` for linux
 - Usage: windows: `py MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"` in powershell; linux `MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"`
 - A .data file will be created, containing a list with note,duration,note,duration...
+
+# Conclusion
+The Assembly Gauntlet wasn't an easy task for a first semester project. Nonetheless, there are still bugs, with the main problem is that RARS can't assemble the game due to the [branch 12-bit limit range](#12-bit-limit-range), since the code became too big and it was only noticed as the project was nearing its end, where a whole re-edit in the code would be needed in order to fix it, so run it using fpgrars by dragging and dropping the main file (The Assembly Gauntlet.s) into the .exe 
+
+
+# The Assembly Gauntlet Português
