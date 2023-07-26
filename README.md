@@ -10,7 +10,7 @@ Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and 
 in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main 
 objective was to implement the following:
 - [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
-- [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
+- [Keyboard interface](#keyboard) (Keyboard and Display MMIO simulator);
 - Animation and movement of player and their attacks;
 - At least 3 levels with different layouts;
 - Colision with walls and enemies
@@ -113,7 +113,7 @@ beqz a7,NORMAL
 			bgt a4,t2,PRINT_LINE	#if height > line counter, repeat
 			ret
 ```
-## Keybord Interface
+## Keybord
 
 The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO 
 address was loaded and read to see whether the player was giving any input and, afterwards, which key was 
