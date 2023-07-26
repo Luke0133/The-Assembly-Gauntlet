@@ -10,7 +10,7 @@ Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and 
 - [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
 - [Animation and movement of player and their attacks](#animation-and-player-movement);
-- [Colision with](#colisions) walls and enemies;
+- [Colision with](#colisions) [walls](#static-colision) [and enemies](#dynamic-colision);
 - At least 3 levels with different layouts;
 - System for opening doors with keys collected
 - Condition for winning levels or failing them (losing due to lack of life points)
@@ -149,6 +149,7 @@ As for the animations, it was decided that every animation set for a sprite woul
 
 ## Colisions
 
+### Static Colision
 Making a colision system was at first a daunting task. With a bit of help from [Victor Manuel and Nathália Pereira's Celeste Assembly Project](https://github.com/tilnoene/celeste-assembly), it was decided that the colision with maps (**we named as static colison**) would work with a mirror version of the map the player is currently at, which was color-coded indicating whether player could walk or not. When a static colision check was called, four pixels from a the direction the player was facing at would be checked before allowing them to move or not. If any of them returned a number different than zero, the player wouldn't be able to move. Additionally, projectiles would stop at normal walls (blue), but could go through some barriers (orange).
 
 ![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
@@ -156,6 +157,9 @@ Making a colision system was at first a daunting task. With a bit of help from [
 
 ![image](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/0c82bb82-d015-4d8c-a5c0-2d0866d97d7c)
 <sub>**Left:** Player trying to go through a wall; **Middle:** The red rectangle represents the boundaries of the player sprite (just for representation purposes), and the yellow pixels represent the player's hitbox pixels that are to be tested; **Right:** Since player is trying to move foward, the 4 front pixels from the hitbox are the only to be tested, and their coordinates are added by 4 in the Y axis in order to check whether player can move foward (spoiler: he can't)</sub>
+
+### Dynamic Colision
+Afterwards, we needed to make the player and projectiles to colide
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
