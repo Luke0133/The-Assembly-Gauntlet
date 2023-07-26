@@ -366,20 +366,20 @@ Gauntlet (1985 - Atari) é um jogo arcade de fantasia estilo hack-and-slash dese
 - [Sistema de coleta de chaves e abertura de portas](#colisão-dinâmica);
 - [Condição de vitória em uma fase](#colisão-estática) e [de derrota (em razão de zerar a vida ou acabar o tempo)](#morte-do-jogador);
 - [Pelo menos dois tipos de inimigos que andam e atacam o jogador](#inimigos);
-- [Pelo menos 3 layouts de mapas](#direação-artística-design-dos-níveis-e-do-menu);
-- [Menu com score, nível e vida do jogador](#direação-artística-design-dos-níveis-e-do-menu);
+- [Pelo menos 3 layouts de mapas](#direção-artística-design-dos-níveis-e-do-menu);
+- [Menu com score, nível e vida do jogador](#direção-artística-design-dos-níveis-e-do-menu);
 
 
 # Metodologia
-The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), available in the game directory.
+The Assembly Gauntlet foi feito usando uma versão customizada do RISC-V Assembler and Runtime Simulator (RARS), disponível no diretório do jogo.
 
 ## Interface Gráfica
 
-***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for otherresolutions, but some tweaking would be necessary.***
+***Obs.: essa seção foi feita baseada em uma resolução de 320 x 240. É possível usar a mesma lógica para outras resoluções, mas algumas alterações são necessárias.***
 
-The project was started with implementing graphics interface (320 x 240 resolution) and the character movement. We followed a tutorial made by [Davi Paturi](https://youtu.be/2BBPNgLP6_s) teaching us the basics for rendering a character in the Bitmap Display. After some initial problems due to our lack of Assemlby experience, we were able to make the character and map to be rendered by using the following logic: after getting the ammount of lines and columns that needed to be rendered, the program would get the first Bitmap Display address (0x0FF0), add the frame value to it (0 or 1), make a shift of 20 bits to correct the address (0xFF00 0000 or 0xFF10 0000),add the top left X coordinate and Y*320 (for skipping lines). The printing address would turn out to be 0xFF00 0000 + X + (Y * 320) or 0xFF10 0000 + X + (Y * 320). Afterwards the image is ready to be printed; with some registers used as counters, the program would load a word from the image and store it in the calculated display address, for j columns for i lines.
+O projeto começou com a implementação da interface gráfica (resolução de 320 x 240) e com a movimentação do personagem. Nós seguimos o tutorial feito por [Davi Paturi](https://youtu.be/2BBPNgLP6_s) que nos ensinava o básico da renderização do personagem em um Bitmap Diplay. Depois de uns problemas iniciais devido à nossa falta de experiência com Assemlby, conseguimos renderizar o personagem e o mapa usando a lógica a seguir: depois de receber o número de linhas e de colunas para renderizar, o programa pega o o primeiro endereço do Bitmap Display  (0x0FF0), adiciona o valor do frame (0 or 1), faz um shift de 20 bits para corrigir o endereço (0xFF00 0000 ou 0xFF10 0000), adiciona o X do canto esquerdo superior e o Y*320 (para pular as linhas). O endereço em que a imagem será printada é 0xFF00 0000 + X + (Y * 320) ou 0xFF10 0000 + X + (Y * 320). Depois disso, a imagem está pronta para ser printada; com alguns registradores sendo usados como contadores, o programa carrega uma word da imagem e guarda-a no endereço calculado, por j colunas e i linhas.
 
-The next problem was to remove the trail made by the character after moving. With the tutorial used, the player would need to move in tilesets, but we didn't want that. So we developed a logic for getting an specific section of a larger image in order to print it where the player previously was. The same logic used for printing into an specific coordinate from the bitmap display was used for the image address. The program would recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * Y), and, in the printing loop, it would also be adding 320 - the width of the player to the image address for every line printed. The code turned out to be like this:
+O próximo problema foi remover o rastro criado pelo personagem após a movimentação. Com o tutorial usado, o jogador precisaria se mover em tilesets, mas não queríamos isso. Assim, desenvolvemos uma lógica para obter uma seção específica de uma imagem maior para imprimi-la onde o jogador estava anteriormente. A mesma lógica usada para imprimir em uma coordenada específica do Bitmap Diplay foi usada para o endereço da imagem. O programa recebe o endereço da imagem e adiciona a ele a antiga posição X do jogador e Y*320 (endereço da imagem + X + 320 * Y), e, no loop de impressão, também adiciona 320 - a largura do jogador no endereço da imagem para cada linha impressa. O código ficou assim:
 
 #### Examplo 1:
 ```
@@ -450,7 +450,7 @@ beqz a7,NORMAL
 ```
 ## Interface com Teclado
 
-The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO address was loaded and read to see whether the player was giving any input and, afterwards, which key was being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 and 'a' is 97_). Using a [macro](#about-macros) we quickly made every key check possible, which sent the program to an specific label to process that input. The results are as following:
+O [mesmo tutorial](https://youtu.be/2BBPNgLP6_s) também nos ajudou com a interface do teclado, onde o endereço KDMMIO foi carregado e lido para ver se o jogador está realizando algum input e, depois, qual tecla está sendo pressionada. Como as teclas são associadas a caracteres ASCII, elas diferenciam maiúsculas de minúsculas (_já que 'A' é 65 e 'a' é 97_). Usando um [macro](#sobre-macros), fizemos rapidamente todas as verificações de chave possíveis, as quais mandavam o programa para uma label específica para processar essa entrada. Os resultados são os seguintes:
 
 #### Examplo 2:
 ```
@@ -491,7 +491,7 @@ INPUT_CHECK:
 	check_key('3', SET_LEVEL_3, t0,SKIP_J)	# Checks if key pressed is '3' (LEVEL3)
 ```
 ## Interface de Áudio
-For the audio interface, we used syscalls 30 and 31. We couldn't use syscall 32 (pause), since every time a note would play, the program would stop. Thus, we used the syscall 30 (Time), which gets the current time (milliseconds since 1 January 1970), and stored the time returned in a0 into a data label every time a note starts playing. Afterwards, it is compared every time a play sound is called with a new time, and if the **new time - time note started** is greater or equal to the note's duration, it could play another note. We also stored an index to know which note was being played and if the sound should be played or not. During the program itself we would stop all sounds and call only specific musics at a time. The algorythm is as follows:
+Para a interface de áudio, usamos as syscalls 30 e 31. Não poderíamos usar a syscall 32 (pausa), pois toda vez que uma nota tocava, o programa parava. Assim, usamos a syscall 30 (Time), que obtém a hora atual (milissegundos desde 1º de janeiro de 1970) e armazenamos o tempo retornado em a0 em uma label de dados toda vez que uma nota começa a tocar. Depois, compara-se toda vez que um som é chamado para ser tocado com um novo tempo, e se o **novo tempo - tempo da nota iniciada** for maior ou igual à duração da nota, ele poderá tocar outra nota. Também armazenamos um índice para saber qual nota está sendo tocada e se o som deve ser tocado ou não. Durante o próprio programa, paramos todos os sons e chamamos apenas músicas específicas a cada vez. O algoritmo é o seguinte:
 
 #### Examplo 3:
 ```
@@ -562,10 +562,16 @@ PLAY_MUSIC:
 	CANT_PLAY_SOUND:
 		ret
 ```
-As for the music itself, we were able to get the list containing the note-duration sequence with help from [Davi Paturi's Hooktheory program](https://gist.github.com/davipatury/cc32ee5b5929cb6d1b682d21cd89ae83) and with a tweaked version (in order to work) of the program from [Gabriel B. G.](https://github.com/Zen-o/Tradutor_MIDI-RISC-V/blob/main/tradutor_midi_risc-v.py)(also available in this main repository, [tutorial on how to use](#midi-converter-usage)), that can convert any midi file into this list.
-
+Quanto à música em si, conseguimos obter a lista contendo a sequência de nota,duração com a ajuda do [programa Hooktheory de Davi Paturi](https://gist.github.com/davipatury/cc32ee5b5929cb6d1b682d21cd89ae83) e com uma versão aprimorada (para poder funcionar) do programa do [Gabriel B. G.](https://github.com/Zen-o/Tradutor_MIDI-RISC-V/blob/main/tradutor_midi_risc-v.py)(também disponível neste repositório principal, [ tutorial sobre como usar](#como-usar-conversor-midi)), que pode converter qualquer arquivo MIDI em uma lista contendo nota e duração intercaladas.
 
 ## Movimentação e Animção do Jogador
+
+Como dito anteriormente, não queríamos fazer com que o jogador tivesse movimentação vinculada a um tileset. Portanto, em vez da sprite do jogador (24x24) mover 24 pixels por input, ele moveria 4 pixels por entrada. Após cada input relacionado ao movimento, as coordenadas do jogador são atualizadas (adicionando/subtraindo 4 a uma coordenada e armazenando as coordenadas antigas do jogador em um endereço de memória). _É importante lembrar que se você estiver imprimindo usando words, cada coordenada deve ser um múltiplo de 4, portanto a velocidade do jogador é 4_.
+
+Quanto às animações, foi decidido que todas as animações definidas para uma sprite estariam no mesmo arquivo. Com um índice sendo usado para pular linhas ([veja o uso do registrador a6 no algoritmo de renderização](#examplo-1:)) com base em qual fase da animação o sprite está. Este índice multiplicará uma altura predeterminada do sprite e pulará as linhas de índice de altura* no arquivo de imagem. Para atualizar o índice, usamos diferentes sistemas para fazer um ciclo de animação: para o jogador, projéteis e ataques, cada entrada atualizará os índices; para objetos de fundo (como as ondas), os índices são atualizados a cada _time_ ms; e para os inimigos, cada ação está vinculada a uma atualização de índice. Seguem algumas imagens de exemplo:
+
+![Exemplos de animação de sprites](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/f96f3a15-5de6-4de5-a2e6-bb42519d3c37)
+<sub>Exemplo de imagens sprite usadas</sub>
 
 As previously said, we didn't want to make the player movement to be linked to a tileset, thus, instead of the player's sprite (24x24) move 24 pixels per input, they move 4 pixels per input. After every input related with movement, the player's coordinates will be updated (adding/subtracting 4 to a coordinate, storing player's old coordinates in a memory address). _It's importatn to remember that if you are printing using words, every coordinate must be a multiple of 4, hence the player speed being 4_.
 
@@ -621,7 +627,7 @@ until printing height (240) is achieved
 ```
 
 
-## Direação artística, design dos níveis e do menu
+## Direção artística, design dos níveis e do menu
 The sprites were made with [krita](https://krita.org/en/) and the menu was also put into the level map images. The information available in the menu info is updated according to the time/damage player has (shown as health), the ammount of score player has (gained by killing enemies and collecting keys or chests), and depending on how many digits there are, the numbers will be rendered centered in the menu. As for the Main Menu and Game Over menu, a simple counter that stores the option being selected indicates where the selection arrows should be rendered
 
 ![Game screenshot](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/02176585-cc33-42c6-8e4b-bac932f896dc)
@@ -629,7 +635,7 @@ The sprites were made with [krita](https://krita.org/en/) and the menu was also 
 ![Game menus](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/fef23cc7-0b3a-4fba-a1ec-d9872693728d)
 
 ## Observações finais
-### 12-bit Limit Range
+### Limite de 12 bits
 Branches have a 12-bit limit range. In order to avoid this (do it since the beggining of the code) do:
 ```
 # instead of doing:
@@ -643,7 +649,7 @@ j label
 skip_label:
 ```
 
-### About Macros
+### Sobre Macros
 I should say this now already: macros are a ***bad idea***. We used them based on old projects, but there are 
 some important things that newcomers like us need to know about them: Macros arent like high-level languages' 
 functions. They litteraly write the code put into them every time they are called, so in a case like this:
@@ -681,13 +687,13 @@ j  MOV_LEFT
 SKIP_D:
 ```
 so make sure that your codes used in macros arent too long, otherwise, you may fall victim to the [12-bit 
-branch limit range](#12-bit-limit-range) exceeded very very quickly. ***If*** you are to use this, make sure to remember this, but
+branch limit range](#limite-de-12-bits) exceeded very very quickly. ***If*** you are to use this, make sure to remember this, but
 if you are new to Assembly and can avoid it, do it (don't make the same mistake as we did)
 
-### MIDI Converter Usage
+### Como usar Conversor MIDI
 - You need to have python and mido installed `py -m pip install mido` for windows powershell or `pip install mido` for linux
 - Usage: windows: `py MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"` in powershell; linux `MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"`
 - A .data file will be created, containing a list with note,duration,note,duration...
 
 # Conclusão
-The Assembly Gauntlet wasn't an easy task for a first semester project. Nonetheless, there are still bugs, with the main problem is that RARS can't assemble the game due to the [branch 12-bit limit range](#12-bit-limit-range), since the code became too big and it was only noticed as the project was nearing its end, where a whole re-edit in the code would be needed in order to fix it, so run it using fpgrars by dragging and dropping the main file (The Assembly Gauntlet.s) into the .exe 
+The Assembly Gauntlet wasn't an easy task for a first semester project. Nonetheless, there are still bugs, with the main problem is that RARS can't assemble the game due to the [branch 12-bit limit range](#limite-de-12-bits), since the code became too big and it was only noticed as the project was nearing its end, where a whole re-edit in the code would be needed in order to fix it, so run it using fpgrars by dragging and dropping the main file (The Assembly Gauntlet.s) into the .exe 
