@@ -154,6 +154,9 @@ Making a colision system was at first a daunting task. With a bit of help from [
 ![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
 <sub>Map 2.1 and it's mirror version with hitbox</sub>
 
+![image](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/0c82bb82-d015-4d8c-a5c0-2d0866d97d7c)
+<sub>**Left:** Player trying to go through a wall; **Middle:** The red rectangle represents the boundaries of the player sprite (just for representation purposes), and the yellow pixels represent the </sub>
+
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
 some important things that newcomers like us need to know about them: Macros arent like high-level languages' 
