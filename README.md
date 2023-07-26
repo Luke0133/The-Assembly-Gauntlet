@@ -6,12 +6,10 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 
 
 # Context
-Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job 
-in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main 
-objective was to implement the following:
+Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main objective was to implement the following:
 - [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
-- Animation and movement of player and their attacks;
+- [Animation and movement of player and their attacks](#animation-and-player-movement);
 - At least 3 levels with different layouts;
 - Colision with walls and enemies
 - System for opening doors with keys collected
@@ -21,32 +19,16 @@ objective was to implement the following:
 - Audio interface, music and sound effects.
 
 # Methodology
-The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), 
-available in the game directory.
+The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), available in the game directory.
 
 ## Graphics Interface
 
-***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for other
-resolutions, but some tweaking would be necessary.***
+***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for otherresolutions, but some tweaking would be necessary.***
 
-The project was started with implementing graphics interface (320 x 240 resolution) and the character movement. 
-We followed a tutorial made by [Davi Paturi](https://youtu.be/2BBPNgLP6_s) teaching us the basics for rendering 
-a character in the Bitmap Display. After some initial problems due to our lack of Assemlby experience, we were 
-able to make the character and map to be rendered by using the following logic: after getting the ammount of 
-lines and columns that needed to be rendered, the program would get the first Bitmap Display address (0x0FF0), 
-add the frame value to it (0 or 1), make a shift of 20 bits to correct the address (0xFF00 0000 or 0xFF10 0000),
-add the top left X coordinate and Y*320 (for skipping lines). The printing address would turn out to be 
-0xFF00 0000 + X + (Y * 320) or 0xFF10 0000 + X + (Y * 320). Afterwards the image is ready to be printed; with 
-some registers used as counters, the program would load a word from the image and store it in the calculated 
-display address, for j columns for i lines.
+The project was started with implementing graphics interface (320 x 240 resolution) and the character movement. We followed a tutorial made by [Davi Paturi](https://youtu.be/2BBPNgLP6_s) teaching us the basics for rendering a character in the Bitmap Display. After some initial problems due to our lack of Assemlby experience, we were able to make the character and map to be rendered by using the following logic: after getting the ammount of lines and columns that needed to be rendered, the program would get the first Bitmap Display address (0x0FF0), add the frame value to it (0 or 1), make a shift of 20 bits to correct the address (0xFF00 0000 or 0xFF10 0000),add the top left X coordinate and Y*320 (for skipping lines). The printing address would turn out to be 0xFF00 0000 + X + (Y * 320) or 0xFF10 0000 + X + (Y * 320). Afterwards the image is ready to be printed; with some registers used as counters, the program would load a word from the image and store it in the calculated display address, for j columns for i lines.
 
-The next problem was to remove the trail made by the character after moving. With the tutorial used, the 
-player would need to move in tilesets, but we didn't want that. So we developed a logic for getting an 
-specific section of a larger image in order to print it where the player previously was. The same logic used 
-for printing into an specific coordinate from the bitmap display was used for the image address. The program 
-would recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * 
-Y), and, in the printing loop, it would also be adding 320 - the width of the player to the image address for 
-every line printed. The code turned out to be like this:
+The next problem was to remove the trail made by the character after moving. With the tutorial used, the player would need to move in tilesets, but we didn't want that. So we developed a logic for getting an specific section of a larger image in order to print it where the player previously was. The same logic used for printing into an specific coordinate from the bitmap display was used for the image address. The program would recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * Y), and, in the printing loop, it would also be adding 320 - the width of the player to the image address for every line printed. The code turned out to be like this:
+
 #### Example 1:
 ```
 ##########################     RENDER IMAGE    ##########################
@@ -116,11 +98,9 @@ beqz a7,NORMAL
 ```
 ## Keyboard Interface
 
-The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO 
-address was loaded and read to see whether the player was giving any input and, afterwards, which key was 
-being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 
-and 'a' is 97_). Using a [macro](#about-macros) we quickly made every key check possible, which sent the 
-program to an specific label to process that input. The results are as following:
+The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO address was loaded and read to see whether the player was giving any input and, afterwards, which key was being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 and 'a' is 97_). Using a [macro](#about-macros) we quickly made every key check possible, which sent the program to an specific label to process that input. The results are as following:
+
+#### Example 2:
 ```
 ####################      INPUT CHECK       ######################
 #								 #
@@ -158,6 +138,14 @@ INPUT_CHECK:
 	check_key('2', SET_LEVEL_2, t0,SKIP_I)	# Checks if key pressed is '2' (LEVEL2)
 	check_key('3', SET_LEVEL_3, t0,SKIP_J)	# Checks if key pressed is '3' (LEVEL3)
 ```
+## Animation and Player Movement
+
+As previously said, we didn't want to make the player movement to be linked to a tileset, thus, instead of the player's sprite (24x24) move 24 pixels per input, they move 4 pixels per input. After every input related with movement, the player's coordinates will be updated (adding/subtracting 4 to a coordinate, storing player's old coordinates in a memory address). _It's importatn to remember that if you are printing using words, every coordinate must be a multiple of 4, hence the player speed being 4_.
+
+As for the animations, it was decided that every animation set for a sprite would be in the same file. With an index being used for skipping lines ([see the use of the a6 register in the rendering algorythm](#example-1:)) based on which animation phase is the sprite at. This index will multiply a pre-determined sprite height and will skip height*index lines in the image file. For updating the index, we used different systems in order to make an animation cycle: for the player, projectiles and attacks, every input will update the indexes; for background objects (such as the waves), the indexes are updated every _time_ ms; and for the enemies, every action is tied to an index update. Here are some exemple images:   
+
+[(The-Assembly-Gauntlet/THE_ASSEMBLY_GAUNTLET/Sprites Images
+/PC_Front.bmp)](https://github.com/Luke0133/The-Assembly-Gauntlet/blob/main/THE_ASSEMBLY_GAUNTLET/Sprites%20Images/PC_Front.bmp)
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
