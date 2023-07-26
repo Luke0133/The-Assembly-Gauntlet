@@ -144,7 +144,8 @@ As previously said, we didn't want to make the player movement to be linked to a
 
 As for the animations, it was decided that every animation set for a sprite would be in the same file. With an index being used for skipping lines ([see the use of the a6 register in the rendering algorythm](#example-1:)) based on which animation phase is the sprite at. This index will multiply a pre-determined sprite height and will skip height*index lines in the image file. For updating the index, we used different systems in order to make an animation cycle: for the player, projectiles and attacks, every input will update the indexes; for background objects (such as the waves), the indexes are updated every _time_ ms; and for the enemies, every action is tied to an index update. Here are some exemple images:   
 
-![image](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/8f92229d-d164-45fc-be34-bfc9a898c1b5)
+![image](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/c4970daf-544c-45bb-b921-6c9b21b86438)
+
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
