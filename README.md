@@ -150,8 +150,9 @@ As for the animations, it was decided that every animation set for a sprite woul
 ## Colisions
 
 Making a colision system was at first a daunting task. With a bit of help from [Victor Manuel and Nathália Pereira's Celeste Assembly Project](https://github.com/tilnoene/celeste-assembly), it was decided that the colision with maps (**we named as static colison**) would work with a mirror version of the map the player is currently at, which was color-coded indicating whether player could walk or not. When a static colision check was called, four pixels from a the direction the player was facing at would be checked before allowing them to move or not. If any of them returned a number different than zero, the player wouldn't be able to move. Additionally, projectiles would stop at normal walls (blue), but could go through some barriers (orange).
-![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
 
+![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
+<sub>Map 2.1 and it's mirror version with hitbox</sub>
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
