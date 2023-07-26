@@ -10,8 +10,8 @@ Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and 
 - [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
 - [Animation and movement of player and their attacks](#animation-and-player-movement);
+- [Colision with](#colisions) walls and enemies;
 - At least 3 levels with different layouts;
-- Colision with walls and enemies
 - System for opening doors with keys collected
 - Condition for winning levels or failing them (losing due to lack of life points)
 - At least two types of enemies that move and attack the player;
@@ -144,9 +144,13 @@ As previously said, we didn't want to make the player movement to be linked to a
 
 As for the animations, it was decided that every animation set for a sprite would be in the same file. With an index being used for skipping lines ([see the use of the a6 register in the rendering algorythm](#example-1:)) based on which animation phase is the sprite at. This index will multiply a pre-determined sprite height and will skip height*index lines in the image file. For updating the index, we used different systems in order to make an animation cycle: for the player, projectiles and attacks, every input will update the indexes; for background objects (such as the waves), the indexes are updated every _time_ ms; and for the enemies, every action is tied to an index update. Here are some exemple images:   
 
-![Sprite animation exemples](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/f96f3a15-5de6-4de5-a2e6-bb42519d3c37)
+![Sprite animation examples](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/f96f3a15-5de6-4de5-a2e6-bb42519d3c37)
 <sub>Exemple of sprite images used</sub>
 
+## Colisions
+
+Making a colision system was at first a daunting task. With a bit of help from [Victor Manuel and Nathália Pereira's Celeste Assembly Project](https://github.com/tilnoene/celeste-assembly), it was decided that the colision with maps (**we named as static colison**) would work with a mirror version of the map the player is currently at, which was color-coded indicating whether player could walk or not. When a static colision check was called, four pixels from a the direction the player was facing at would be checked before allowing them to move or not. If any of them returned a number different than zero, the player wouldn't be able to move. Additionally, projectiles would stop at normal walls (blue), but could go through some barriers (orange).
+![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
 
 
 ### About Macros
