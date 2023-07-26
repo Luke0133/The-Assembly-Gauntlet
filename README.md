@@ -4,15 +4,13 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 - [Methodology](#methodology)
 
 
-[click me](every-line-printed.-The-code-turned-out-to-be-like-this:)
-
 
 # Context
 Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job 
 in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main 
 objective was to implement the following:
 - [Graphics interface](##graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
-- Keyboard interface (Keyboard and Display MMIO simulator);
+- [Keyboard interface](##keyboard-interface) (Keyboard and Display MMIO simulator);
 - Animation and movement of player and their attacks;
 - At least 3 levels with different layouts;
 - Colision with walls and enemies
@@ -39,12 +37,12 @@ add the top left X coordinate and Y*320 (for skipping lines). The printing addre
 some registers used as counters, the program would load a word from the image and store it in the calculated 
 display address, for j columns for i lines.
 
-The next problem was to remove the trail made by the character after moving. With the tutorial used, the player 
-would need to move in tilesets, but we didn't want that. So we developed a logic for getting an specific 
-section of a larger image in order to print it where the player previously was. The same logic used for 
-printing into an specific coordinate from the bitmap display was used for the image address. The program would 
-recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * Y), 
-and, in the printing loop, it would also be adding 320 - the width of the player to the image address for 
+The next problem was to remove the trail made by the character after moving. With the tutorial used, the 
+player would need to move in tilesets, but we didn't want that. So we developed a logic for getting an 
+specific section of a larger image in order to print it where the player previously was. The same logic used 
+for printing into an specific coordinate from the bitmap display was used for the image address. The program 
+would recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * 
+Y), and, in the printing loop, it would also be adding 320 - the width of the player to the image address for 
 every line printed. The code turned out to be like this:
 ```
 ##########################     RENDER IMAGE    ##########################
@@ -112,4 +110,87 @@ beqz a7,NORMAL
 			bgt a4,t2,PRINT_LINE	#if height > line counter, repeat
 			ret
 ```
+##Keybord Interface
+The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO 
+address was loaded and read to see whether the player was giving any input and, afterwards, which key was 
+being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 
+and 'a' is 97_). Using a [macro](###about-macros) we quickly made every key check possible, which sent the 
+program to an specific label to process that input. The results are as following:
+```
+####################      INPUT CHECK       ######################
+#								 #
+#	Checks whether the player has pressed any key		 #
+#								 #
+##################################################################
 
+INPUT_CHECK:		
+	# Checks before seeing input
+   	la t0, LEVEL_INFO		# Loads Level Info
+   	lh t2,0(t0)			# t2 = level number (if t2 = 0, it means it is in the menu)
+   	
+	li t1,0xFF200000		# Loads KDMMIO Address
+	lw t0,0(t1)			# Reads the Keybord Control bit
+	andi t0,t0,0x0001		# masks least significant bit
+   	beq t0,zero,NO_INPUT   	   	# If no input, get out of function
+   	
+   	# Checks before seeing input
+   	la t0, LEVEL_INFO		# Loads Level Info
+   	lh t2,0(t0)			# t2 = level number (if t2 = 0, it means it is in the menu)
+   	la t0,PLYR_STATUS		# Loads Player Status
+	lh t3,6(t0)			# t3 stores 0 if player isn't attacking and 1 if player is attacking
+	bnez t3,ATTACK_UPDATE			# If player attacking, can't move, but it won't count as no input
+  	
+  	# Checking input
+  	lw t0,4(t1)  			# Reads key value
+  	check_key('s', MOV_DOWN, t0,SKIP_A)	# Checks if key pressed is 's'
+	check_key('w', MOV_UP, t0,SKIP_B)	# Checks if key pressed is 'w'
+	check_key('d', MOV_RIGHT, t0,SKIP_C)	# Checks if key pressed is 'd'
+	check_key('a', MOV_LEFT, t0,SKIP_D)	# Checks if key pressed is 'a'
+	check_key(32, ATTACK, t0,SKIP_E)	# Checks if key pressed is ' ' (SPACE)
+	check_key('\n', SELECT, t0,SKIP_F)	# Checks if key pressed is '\n' (ENTER)
+	check_key(127,KEY_KILL_PLYR, t0,SKIP_G)	# Checks if key pressed is (DELETE)
+	check_key('1', SET_LEVEL_1, t0,SKIP_H)	# Checks if key pressed is '1' (LEVEL1)
+	check_key('2', SET_LEVEL_2, t0,SKIP_I)	# Checks if key pressed is '2' (LEVEL2)
+	check_key('3', SET_LEVEL_3, t0,SKIP_J)	# Checks if key pressed is '3' (LEVEL3)
+```
+
+###About Macros
+I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
+some important things that newcomers like us need to know about them: Macros arent like high-level languages' 
+functions. They litteraly write the code put into them every time they are called, so in a case like this:
+```
+.macro check_key(%key,%label,%input,%label2)
+li t1,%key
+bne t1,%input,%label2
+j  %label
+%label2 :
+.end_macro
+
+check_key('s', MOV_DOWN, t0,SKIP_A)	# Checks if key pressed is 's'
+check_key('w', MOV_UP, t0,SKIP_B)	# Checks if key pressed is 'w'
+check_key('d', MOV_RIGHT, t0,SKIP_C)	# Checks if key pressed is 'd'
+check_key('a', MOV_LEFT, t0,SKIP_D)	# Checks if key pressed is 'a'
+	
+```
+every row that calls for check_key will processed as:
+```
+li t1,'s'
+bne t1,t0,SKIP_A
+j  MOV_DOWN
+SKIP_A:
+li t1,'w'
+bne t1,t0,SKIP_B
+j  MOV_UP
+SKIP_B:
+li t1,'d'
+bne t1,t0,SKIP_C
+j  MOV_RIGHT
+SKIP_C:
+li t1,'a'
+bne t1,t0,SKIP_D
+j  MOV_LEFT
+SKIP_D:
+```
+so make sure that your codes used in macros arent too long, otherwise, you may fall victim to the 12-bit 
+branch limit range exceeded very very quickly. ***If*** you are to use this, make sure to remember this, but
+if you are new to Assembly and can avoid it, do it (don't make the same mistake as we did)
