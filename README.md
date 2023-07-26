@@ -24,7 +24,7 @@ objective was to implement the following:
 The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), 
 available in the game directory.
 
-##Graphics Interface
+## Graphics Interface
 
 ***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for other
 resolutions, but some tweaking would be necessary.***
@@ -113,7 +113,7 @@ beqz a7,NORMAL
 			bgt a4,t2,PRINT_LINE	#if height > line counter, repeat
 			ret
 ```
-##Keybord Interface
+## Keybord Interface
 
 The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO 
 address was loaded and read to see whether the player was giving any input and, afterwards, which key was 
@@ -158,7 +158,7 @@ INPUT_CHECK:
 	check_key('3', SET_LEVEL_3, t0,SKIP_J)	# Checks if key pressed is '3' (LEVEL3)
 ```
 
-###About Macros
+### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
 some important things that newcomers like us need to know about them: Macros arent like high-level languages' 
 functions. They litteraly write the code put into them every time they are called, so in a case like this:
