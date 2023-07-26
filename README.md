@@ -9,7 +9,7 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job 
 in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main 
 objective was to implement the following:
-- [Graphics interface](#graphics) (Bitmap Display, 320×240, 8 bits/pixel);
+- [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
 - Animation and movement of player and their attacks;
 - At least 3 levels with different layouts;
@@ -24,7 +24,7 @@ objective was to implement the following:
 The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), 
 available in the game directory.
 
-## Graphics
+## Graphics Interface
 
 ***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for other
 resolutions, but some tweaking would be necessary.***
