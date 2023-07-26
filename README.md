@@ -366,14 +366,14 @@ Gauntlet (1985 - Atari) é um jogo arcade de fantasia estilo hack-and-slash dese
 - [Sistema de coleta de chaves e abertura de portas](#colisão-dinâmica);
 - [Condição de vitória em uma fase](#colisão-estática) e [de derrota (em razão de zerar a vida ou acabar o tempo)](#morte-do-jogador);
 - [Pelo menos dois tipos de inimigos que andam e atacam o jogador](#inimigos);
-- [Pelo menos 3 layouts de mapas](#diração-artística-design-dos-níveis-e-do-menu);
-- [Menu com score, nível e vida do jogador](#diração-artística-design-dos-níveis-e-do-menu);
+- [Pelo menos 3 layouts de mapas](#direação-artística-design-dos-níveis-e-do-menu);
+- [Menu com score, nível e vida do jogador](#direação-artística-design-dos-níveis-e-do-menu);
 
 
 # Metodologia
 The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), available in the game directory.
 
-## Graphics Interface
+## Interface Gráfica
 
 ***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for otherresolutions, but some tweaking would be necessary.***
 
@@ -381,7 +381,7 @@ The project was started with implementing graphics interface (320 x 240 resoluti
 
 The next problem was to remove the trail made by the character after moving. With the tutorial used, the player would need to move in tilesets, but we didn't want that. So we developed a logic for getting an specific section of a larger image in order to print it where the player previously was. The same logic used for printing into an specific coordinate from the bitmap display was used for the image address. The program would recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * Y), and, in the printing loop, it would also be adding 320 - the width of the player to the image address for every line printed. The code turned out to be like this:
 
-#### Example 1:
+#### Examplo 1:
 ```
 ##########################     RENDER IMAGE    ##########################
 #     -----------           argument registers           -----------    #
@@ -448,11 +448,11 @@ beqz a7,NORMAL
 			bgt a4,t2,PRINT_LINE	#if height > line counter, repeat
 			ret
 ```
-## Keyboard Interface
+## Interface com Teclado
 
 The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO address was loaded and read to see whether the player was giving any input and, afterwards, which key was being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 and 'a' is 97_). Using a [macro](#about-macros) we quickly made every key check possible, which sent the program to an specific label to process that input. The results are as following:
 
-#### Example 2:
+#### Examplo 2:
 ```
 ####################      INPUT CHECK       ######################
 #								 #
@@ -490,10 +490,10 @@ INPUT_CHECK:
 	check_key('2', SET_LEVEL_2, t0,SKIP_I)	# Checks if key pressed is '2' (LEVEL2)
 	check_key('3', SET_LEVEL_3, t0,SKIP_J)	# Checks if key pressed is '3' (LEVEL3)
 ```
-## Audio Interface
+## Interface de Áudio
 For the audio interface, we used syscalls 30 and 31. We couldn't use syscall 32 (pause), since every time a note would play, the program would stop. Thus, we used the syscall 30 (Time), which gets the current time (milliseconds since 1 January 1970), and stored the time returned in a0 into a data label every time a note starts playing. Afterwards, it is compared every time a play sound is called with a new time, and if the **new time - time note started** is greater or equal to the note's duration, it could play another note. We also stored an index to know which note was being played and if the sound should be played or not. During the program itself we would stop all sounds and call only specific musics at a time. The algorythm is as follows:
 
-#### Example 3:
+#### Examplo 3:
 ```
 PLAY_MUSIC:	
 # s1 is the address of an array of informations as followed:
@@ -565,39 +565,39 @@ PLAY_MUSIC:
 As for the music itself, we were able to get the list containing the note-duration sequence with help from [Davi Paturi's Hooktheory program](https://gist.github.com/davipatury/cc32ee5b5929cb6d1b682d21cd89ae83) and with a tweaked version (in order to work) of the program from [Gabriel B. G.](https://github.com/Zen-o/Tradutor_MIDI-RISC-V/blob/main/tradutor_midi_risc-v.py)(also available in this main repository, [tutorial on how to use](#midi-converter-usage)), that can convert any midi file into this list.
 
 
-## Animation and Player Movement
+## Movimentação e Animção do Jogador
 
 As previously said, we didn't want to make the player movement to be linked to a tileset, thus, instead of the player's sprite (24x24) move 24 pixels per input, they move 4 pixels per input. After every input related with movement, the player's coordinates will be updated (adding/subtracting 4 to a coordinate, storing player's old coordinates in a memory address). _It's importatn to remember that if you are printing using words, every coordinate must be a multiple of 4, hence the player speed being 4_.
 
-As for the animations, it was decided that every animation set for a sprite would be in the same file. With an index being used for skipping lines ([see the use of the a6 register in the rendering algorythm](#example-1:)) based on which animation phase is the sprite at. This index will multiply a pre-determined sprite height and will skip height*index lines in the image file. For updating the index, we used different systems in order to make an animation cycle: for the player, projectiles and attacks, every input will update the indexes; for background objects (such as the waves), the indexes are updated every _time_ ms; and for the enemies, every action is tied to an index update. Here are some exemple images:   
+As for the animations, it was decided that every animation set for a sprite would be in the same file. With an index being used for skipping lines ([see the use of the a6 register in the rendering algorythm](#examplo-1:)) based on which animation phase is the sprite at. This index will multiply a pre-determined sprite height and will skip height*index lines in the image file. For updating the index, we used different systems in order to make an animation cycle: for the player, projectiles and attacks, every input will update the indexes; for background objects (such as the waves), the indexes are updated every _time_ ms; and for the enemies, every action is tied to an index update. Here are some exemple images:   
 
-![Sprite animation examples](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/f96f3a15-5de6-4de5-a2e6-bb42519d3c37)
+![Exemplos de animação de sprites](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/f96f3a15-5de6-4de5-a2e6-bb42519d3c37)
 <sub>Exemple of sprite images used</sub>
 
-## Colisions
+## Colisões
 
-### Static Colision
+### Colisão Estática
 Making a colision system was at first a daunting task. With a bit of help from [Victor Manuel and Nathália Pereira's Celeste Assembly Project](https://github.com/tilnoene/celeste-assembly), it was decided that the colision with maps (**we named as static colison**) would work with a mirror version of the map the player is currently at, which was color-coded indicating whether player could walk or not. When a static colision check was called, four pixels from a the direction the player was facing at would be checked before allowing them to move or not. If any of them returned a number different than zero, the player wouldn't be able to move. Additionally, projectiles would stop at normal walls (blue), but could go through some barriers (orange). The colors are as following:
 1. Blue: wall
 2. Orange: wall for player, but projectiles can go through
 3. Purple: go to another level (adds 1 to level counter, making player go to another level)
 4. Green: no barriers
 
-![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
+![Exemplo de colisão 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
 <sub>Map 2.1 and it's mirror version with hitbox</sub>
 
-![image](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/0c82bb82-d015-4d8c-a5c0-2d0866d97d7c)
+![Exemplo de colisão 2](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/0c82bb82-d015-4d8c-a5c0-2d0866d97d7c)
 <sub>**Left:** Player trying to go through a wall; **Middle:** The red rectangle represents the boundaries of the player sprite (just for representation purposes), and the yellow pixels represent the player's hitbox pixels that are to be tested; **Right:** Since player is trying to move foward, the 4 front pixels from the hitbox are the only to be tested, and their coordinates are added by 4 in the Y axis in order to check whether player can move foward (spoiler: he can't)</sub>
 
-### Dynamic Colision
+### Colisão Dinâmica
 Afterwards, we needed to make the player colide with enemies, enemy projectiles, keys etc. The logic used was from checking whether two rectangles are intersecting each other. With help from [this high-level language article](https://www.geeksforgeeks.org/find-two-rectangles-overlap/) we found out that two rectangles aren't intersecting each other only when one rectangle is above top edge of other rectangle or when one rectangle is on left side of left edge of other rectangle. With that we knew when the player was coliding with an entity or a door and then we would process acoordingly. For keys, a simple counter that would be stored in a data label would show when the player can go through a door or not.
 
-## Enemies
+## Inimigos
 There are two type of enemies: the slimes walk on a predetermined path and the ULA flowers shoots based on a predetermined pattern. Much like the [music algorythm](#audio-interface), each enemy takes into account a data label that lets it be rendered or not, another one with its life points, its position/old position, animation labels and finally, a pattern, which contains:
 - an index that stores which pattern should be processed
 - a list containing the movement speed and direction alternately or the direction and number of times to shoot alternately, depending on enemy type
 After that, every enemy in each level section will have a different pattern to be processed. The player can shoot them and their projectiles, or walk into them, taking some damage and gaining less points, but killing them nontheless.
-### Player's Death
+### Morte do Jogador
 When the player dies, a circle is rendered arround them. The coordinates are determined by getting the coordinate in the original death image and comparing it to player's coordinate. For instance, if player is at 0;0, the coordinate where rendering will start in the death image is 298;216. The logic for doing this is as follows:
 
 ```
@@ -621,14 +621,14 @@ until printing height (240) is achieved
 ```
 
 
-## Art direction, level design and menu
+## Direação artística, design dos níveis e do menu
 The sprites were made with [krita](https://krita.org/en/) and the menu was also put into the level map images. The information available in the menu info is updated according to the time/damage player has (shown as health), the ammount of score player has (gained by killing enemies and collecting keys or chests), and depending on how many digits there are, the numbers will be rendered centered in the menu. As for the Main Menu and Game Over menu, a simple counter that stores the option being selected indicates where the selection arrows should be rendered
 
 ![Game screenshot](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/02176585-cc33-42c6-8e4b-bac932f896dc)
 
 ![Game menus](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/fef23cc7-0b3a-4fba-a1ec-d9872693728d)
 
-## Final Observations
+## Observações finais
 ### 12-bit Limit Range
 Branches have a 12-bit limit range. In order to avoid this (do it since the beggining of the code) do:
 ```
@@ -689,5 +689,5 @@ if you are new to Assembly and can avoid it, do it (don't make the same mistake 
 - Usage: windows: `py MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"` in powershell; linux `MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"`
 - A .data file will be created, containing a list with note,duration,note,duration...
 
-# Conclusion
+# Conclusão
 The Assembly Gauntlet wasn't an easy task for a first semester project. Nonetheless, there are still bugs, with the main problem is that RARS can't assemble the game due to the [branch 12-bit limit range](#12-bit-limit-range), since the code became too big and it was only noticed as the project was nearing its end, where a whole re-edit in the code would be needed in order to fix it, so run it using fpgrars by dragging and dropping the main file (The Assembly Gauntlet.s) into the .exe 
