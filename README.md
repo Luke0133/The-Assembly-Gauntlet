@@ -23,9 +23,12 @@ objective was to implement the following:
 # Methodology
 The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), 
 available in the game directory.
+
 ##Graphics Interface
+
 ***Obs.: this section is made based on a 320 x 240 resolution. It's possible to use the same logic for other
 resolutions, but some tweaking would be necessary.***
+
 The project was started with implementing graphics interface (320 x 240 resolution) and the character movement. 
 We followed a tutorial made by [Davi Paturi](https://youtu.be/2BBPNgLP6_s) teaching us the basics for rendering 
 a character in the Bitmap Display. After some initial problems due to our lack of Assemlby experience, we were 
@@ -111,6 +114,7 @@ beqz a7,NORMAL
 			ret
 ```
 ##Keybord Interface
+
 The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO 
 address was loaded and read to see whether the player was giving any input and, afterwards, which key was 
 being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 
