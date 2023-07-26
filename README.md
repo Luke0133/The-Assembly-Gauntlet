@@ -155,7 +155,7 @@ Making a colision system was at first a daunting task. With a bit of help from [
 <sub>Map 2.1 and it's mirror version with hitbox</sub>
 
 ![image](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/0c82bb82-d015-4d8c-a5c0-2d0866d97d7c)
-<sub>**Left:** Player trying to go through a wall; **Middle:** The red rectangle represents the boundaries of the player sprite (just for representation purposes), and the yellow pixels represent the </sub>
+<sub>**Left:** Player trying to go through a wall; **Middle:** The red rectangle represents the boundaries of the player sprite (just for representation purposes), and the yellow pixels represent the player's hitbox pixels that are to be tested; **Right:** Since player is trying to move foward, the 4 front pixels from the hitbox are the only to be tested, and their coordinates are added by 4 in the Y axis in order to check whether player can move foward (spoiler: he can't)</sub>
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
