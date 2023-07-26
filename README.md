@@ -9,14 +9,15 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main objective was to implement the following:
 - [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
+- [Audio interface, music and sound effects](#audio-interface).
 - [Animation and movement of player and their attacks](#animation-and-player-movement);
 - [Colision with](#colisions) [walls](#static-colision) [and enemies](#dynamic-colision);
+- [System for opening doors with keys collected](#dynamic-colision);
+- [Condition for winning levels](#static-colision) or failing them (losing due to lack of life points)
+- [At least two types of enemies that move and attack the player](#enemies);
 - At least 3 levels with different layouts;
-- System for opening doors with keys collected
-- Condition for winning levels or failing them (losing due to lack of life points)
-- At least two types of enemies that move and attack the player;
 - Menu with score, level and player's health;
-- Audio interface, music and sound effects.
+
 
 # Methodology
 The Assembly Gauntlet was made using a custom version of the RISC-V Assembler and Runtime Simulator (RARS), available in the game directory.
@@ -138,6 +139,81 @@ INPUT_CHECK:
 	check_key('2', SET_LEVEL_2, t0,SKIP_I)	# Checks if key pressed is '2' (LEVEL2)
 	check_key('3', SET_LEVEL_3, t0,SKIP_J)	# Checks if key pressed is '3' (LEVEL3)
 ```
+## Audio Interface
+For the audio interface, we used syscalls 30 and 31. We couldn't use syscall 32 (pause), since every time a note would play, the program would stop. Thus, we used the syscall 30 (Time), which gets the current time (milliseconds since 1 January 1970), and stored the time returned in a0 into a data label every time a note starts playing. Afterwards, it is compared every time a play sound is called with a new time, and if the **new time - time note started** is greater or equal to the note's duration, it could play another note. We also stored an index to know which note was being played and if the sound should be played or not. During the program itself we would stop all sounds and call only specific musics at a time. The algorythm is as follows:
+
+#### Example 3:
+```
+PLAY_MUSIC:	
+# s1 is the address of an array of informations as followed:
+# (0)	  SONGNAME: 
+# (0) 	  SONGNAME_TIME: .word 0  --- stores the time when note started playing
+#     	  .half
+# (4,6,8) SONGNAME_STATUS: 0,0,0
+#	 		   | | |
+#			   | | +--> Stores instrument
+#			   | +----> Index of note to be played (note address = 2 * index)
+#			   +------> Stores whether soundtrack should be played (0 = no, 1 = yes) -- enabler
+#
+# (10)	   SONGNAME_LENGTH: 0   --- stores the lenght of song
+# (12,14)  SONGNAME_NOTES: 0,0,.... --- stores note and duration, respectively
+
+	lh t0,4(s1)		# Loads Given Address' first status (enabler)
+	beqz t0,CANT_PLAY_SOUND	# If enabler = 0 (can't play soundtrack/sound effect)
+	WILL_PLAY_SOUND:
+		lh t0,6(s1)	# Gets note index
+		slli t0,t0,2	# t0 = 4 * index
+		add s2,s1,t0	# address used for getting notes and durations
+		
+		lw t0,0(s1)	# Gets time note started playing
+		beqz t0,PLAY_NOTE	# If t0 = 0, it means the song just started
+		# Otherwise, check if enough time has passed to play a new note
+		li a7,30	# Gets new time
+		ecall
+		sub t0,a0,t0	# t0 = new time - starting time
+		
+		lh t1,14(s2)
+		bge t0,t1,PLAY_NEW_NOTE
+		j DONT_PLAY_NOTE
+		
+		
+		PLAY_NEW_NOTE:
+			lh t0,6(s1)	# Gets note index
+			addi t0,t0,1	# New index
+			sh t0,6(s1)	# Stores new note index
+			slli t0,t0,2	# t0 = 4 * index
+			add s2,s1,t0	# address used for getting notes and durations
+		PLAY_NOTE:
+		
+			lh a0,12(s2)	# Loads note 
+			lh a1,14(s2)	# Loads note duration		
+			lh a2,8(s1)	# Loads instrument
+			li a3,volume	# Loads volume
+			li a7,31	# syscall play midi
+			ecall
+			
+			li a7,30	# Gets new time
+			ecall
+			
+			sw a0,0(s1)	# and stores it
+			
+		DONT_PLAY_NOTE:
+			lh t0,10(s1)	# loads soundtrack length
+			lh t1,6(s1)	# loads note index
+			blt t1,t0,CONTINUE_PLAYING
+			STOP_PLAYING:
+				li t0, 0 	# loads 0 to t0
+				sh t0, 4(s1)	# and stores it in SOUNDNAME conditions (to stop playing)
+				sh t0, 6(s1)	# DON'T FORGET TO RESET THE INDEX DUMBO
+				ret
+			CONTINUE_PLAYING:	
+				ret
+	CANT_PLAY_SOUND:
+		ret
+```
+As for the music itself, we were able to get the list containing the note-duration sequence with help from [Davi Paturi's Hooktheory program](https://gist.github.com/davipatury/cc32ee5b5929cb6d1b682d21cd89ae83) and with a tweaked version (in order to work) of the program from [Gabriel B. G.](https://github.com/Zen-o/Tradutor_MIDI-RISC-V/blob/main/tradutor_midi_risc-v.py)(also available in this main repository, [tutorial on how to use](#midi-converter-usage)), that can convert any midi file into this list.
+
+
 ## Animation and Player Movement
 
 As previously said, we didn't want to make the player movement to be linked to a tileset, thus, instead of the player's sprite (24x24) move 24 pixels per input, they move 4 pixels per input. After every input related with movement, the player's coordinates will be updated (adding/subtracting 4 to a coordinate, storing player's old coordinates in a memory address). _It's importatn to remember that if you are printing using words, every coordinate must be a multiple of 4, hence the player speed being 4_.
@@ -150,7 +226,11 @@ As for the animations, it was decided that every animation set for a sprite woul
 ## Colisions
 
 ### Static Colision
-Making a colision system was at first a daunting task. With a bit of help from [Victor Manuel and Nathália Pereira's Celeste Assembly Project](https://github.com/tilnoene/celeste-assembly), it was decided that the colision with maps (**we named as static colison**) would work with a mirror version of the map the player is currently at, which was color-coded indicating whether player could walk or not. When a static colision check was called, four pixels from a the direction the player was facing at would be checked before allowing them to move or not. If any of them returned a number different than zero, the player wouldn't be able to move. Additionally, projectiles would stop at normal walls (blue), but could go through some barriers (orange).
+Making a colision system was at first a daunting task. With a bit of help from [Victor Manuel and Nathália Pereira's Celeste Assembly Project](https://github.com/tilnoene/celeste-assembly), it was decided that the colision with maps (**we named as static colison**) would work with a mirror version of the map the player is currently at, which was color-coded indicating whether player could walk or not. When a static colision check was called, four pixels from a the direction the player was facing at would be checked before allowing them to move or not. If any of them returned a number different than zero, the player wouldn't be able to move. Additionally, projectiles would stop at normal walls (blue), but could go through some barriers (orange). The colors are as following:
+1. Blue: wall
+2. Orange: wall for player, but projectiles can go through
+3. Purple: go to another level (adds 1 to level counter, making player go to another level)
+4. Green: no barriers
 
 ![Colision example 1](https://github.com/Luke0133/The-Assembly-Gauntlet/assets/68027676/9daecc3d-056b-43b9-8dfe-d8dbd1a7119c)
 <sub>Map 2.1 and it's mirror version with hitbox</sub>
@@ -159,7 +239,10 @@ Making a colision system was at first a daunting task. With a bit of help from [
 <sub>**Left:** Player trying to go through a wall; **Middle:** The red rectangle represents the boundaries of the player sprite (just for representation purposes), and the yellow pixels represent the player's hitbox pixels that are to be tested; **Right:** Since player is trying to move foward, the 4 front pixels from the hitbox are the only to be tested, and their coordinates are added by 4 in the Y axis in order to check whether player can move foward (spoiler: he can't)</sub>
 
 ### Dynamic Colision
-Afterwards, we needed to make the player and projectiles to colide
+Afterwards, we needed to make the player colide with enemies, enemy projectiles, keys etc. The logic used was from checking whether two rectangles are intersecting each other. With help from [this high-level language article](https://www.geeksforgeeks.org/find-two-rectangles-overlap/) we found out that two rectangles aren't intersecting each other only when one rectangle is above top edge of other rectangle or when one rectangle is on left side of left edge of other rectangle. With that we knew when the player was coliding with an entity or a door and then we would process acoordingly. For keys, a simple counter that would be stored in a data label would show when the player can go through a door or not.
+
+## Enemies
+The
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
@@ -201,3 +284,8 @@ SKIP_D:
 so make sure that your codes used in macros arent too long, otherwise, you may fall victim to the 12-bit 
 branch limit range exceeded very very quickly. ***If*** you are to use this, make sure to remember this, but
 if you are new to Assembly and can avoid it, do it (don't make the same mistake as we did)
+
+### MIDI Converter Usage
+- You need to have python and mido installed `py -m pip install mido` for windows powershell or `pip install mido` for linux
+- Usage: windows: `py MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"` in powershell; linux `MIDI-RISCV-CONVERTER.py "NAME-OF-FILE.mid"`
+- A .data file will be created, containing a list with note,duration,note,duration...
