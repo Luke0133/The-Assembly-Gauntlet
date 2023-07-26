@@ -15,7 +15,7 @@ Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and 
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
 - [Audio interface, music and sound effects](#audio-interface);
 - [Animation and movement of player and their attacks](#animation-and-player-movement);
-- [Colision with](#colisions) [walls](#static-colision) [and enemies](#dynamic-colision);
+- [Colision](#colisions) with [walls](#static-colision) and [enemies](#dynamic-colision);
 - [System for opening doors with keys collected](#dynamic-colision);
 - [Condition for winning levels](#static-colision) or [failing them (losing due to lack of life points)](#players-death);
 - [At least two types of enemies that move and attack the player](#enemies);
@@ -361,8 +361,8 @@ Gauntlet (1985 - Atari) é um jogo arcade de fantasia estilo hack-and-slash dese
 - [Interface gráfica](#interface-gráfica) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Interface com Teclado](#interface-com-teclado) (Keyboard and Display MMIO simulator);
 - [Interface de áudio, música e efeitos sonoros](#interface-de-audio);
-- [Animation and movement of player and their attacks](#animation-and-player-movement);
-- [Colision with](#colisions) [walls](#static-colision) [and enemies](#dynamic-colision);
+- [Animação e movimentação do jogador e seus ataques](#movimentação-e-animção-do-jogador);
+- [Colisão](#colisões) com [paredes](#colisão-estática) e com [inimigos](#dynamic-colision);
 - [System for opening doors with keys collected](#dynamic-colision);
 - [Condition for winning levels](#static-colision) or [failing them (losing due to lack of life points)](#players-death);
 - [At least two types of enemies that move and attack the player](#enemies);
