@@ -15,7 +15,7 @@ Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and 
 - [System for opening doors with keys collected](#dynamic-colision);
 - [Condition for winning levels](#static-colision) or [failing them (losing due to lack of life points)](#players-death);
 - [At least two types of enemies that move and attack the player](#enemies);
-- [At least 3 levels with different layouts](#art-direction,-level-design-and-menu);
+- [At least 3 levels with different layouts](#art-direction-level-design-and-menu);
 - Menu with score, level and player's health;
 
 
