@@ -47,6 +47,7 @@ for printing into an specific coordinate from the bitmap display was used for th
 would recieve the image address and add to it the player's old X position and Y*320 (Image address + X + 320 * 
 Y), and, in the printing loop, it would also be adding 320 - the width of the player to the image address for 
 every line printed. The code turned out to be like this:
+#### Example 1:
 ```
 ##########################     RENDER IMAGE    ##########################
 #     -----------           argument registers           -----------    #
