@@ -9,11 +9,11 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main objective was to implement the following:
 - [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
 - [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
-- [Audio interface, music and sound effects](#audio-interface).
+- [Audio interface, music and sound effects](#audio-interface);
 - [Animation and movement of player and their attacks](#animation-and-player-movement);
 - [Colision with](#colisions) [walls](#static-colision) [and enemies](#dynamic-colision);
 - [System for opening doors with keys collected](#dynamic-colision);
-- [Condition for winning levels](#static-colision) or failing them (losing due to lack of life points)
+- [Condition for winning levels](#static-colision) or [failing them (losing due to lack of life points)](#player's-death);
 - [At least two types of enemies that move and attack the player](#enemies);
 - At least 3 levels with different layouts;
 - Menu with score, level and player's health;
@@ -242,7 +242,35 @@ Making a colision system was at first a daunting task. With a bit of help from [
 Afterwards, we needed to make the player colide with enemies, enemy projectiles, keys etc. The logic used was from checking whether two rectangles are intersecting each other. With help from [this high-level language article](https://www.geeksforgeeks.org/find-two-rectangles-overlap/) we found out that two rectangles aren't intersecting each other only when one rectangle is above top edge of other rectangle or when one rectangle is on left side of left edge of other rectangle. With that we knew when the player was coliding with an entity or a door and then we would process acoordingly. For keys, a simple counter that would be stored in a data label would show when the player can go through a door or not.
 
 ## Enemies
-The
+There are two type of enemies: the slimes walk on a predetermined path and the ULA flowers shoots based on a predetermined pattern. Much like the [music algorythm](#audio-interface), each enemy takes into account a data label that lets it be rendered or not, another one with its life points, its position/old position, animation labels and finally, a pattern, which contains:
+- an index that stores which pattern should be processed
+- a list containing the movement speed and direction alternately or the direction and number of times to shoot alternately, depending on enemy type
+After that, every enemy in each level section will have a different pattern to be processed. The player can shoot them and their projectiles, or walk into them, taking some damage and gaining less points, but killing them nontheless.
+### Player's Death
+When the player dies, a circle is rendered arround them. The coordinates are determined by getting the coordinate in the original death image and comparing it to player's coordinate. For instance, if player is at 0;0, the coordinate where rendering will start in the death image is 298;216. The logic for doing this is as follows:
+
+```
+Find coordinates of Death Screen (620 x 456) based on player's coordinates:
+TOP LEFT X = 298 - PLYR X
+TOP LEFT Y = 216 - PLYR Y
+
+For rendering:
+Y x 620 (aka width) + X = image address for rendering
+for every row, add 620 (aka width) - 320 (printing width)
+until printing height (240) is achieved
+--------------------------------------------------------------------------------
+Find any coordinate of any bigger image (ImgWidth x ImgHeight) based on player's coordinates:
+TOP LEFT X = ImgWidth - PLYR X
+TOP LEFT Y = ImgHeight - PLYR Y
+
+For rendering:
+Y x ImgWidth + X = image address for rendering
+for every row, add 456 (aka width) - 320 (printing width)
+until printing height (240) is achieved
+```
+
+
+## Art direction, level design and menu
 
 ### About Macros
 I should say this now already: macros are a **bad idea**. We used them based on old projects, but there are 
