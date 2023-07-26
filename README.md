@@ -9,8 +9,8 @@ Project made for the University of Brasília, Computer Science, Intruduction to 
 Gauntlet (1985 - Atari) is a fantasy-themed hack-and-slash arcade developed and producted by Atari Games. Our job 
 in this project was to recreate (with artistic liberty) this game using the Assembly RISC-V language. The main 
 objective was to implement the following:
-- [Graphics interface](##graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
-- [Keyboard interface](##keyboard-interface) (Keyboard and Display MMIO simulator);
+- [Graphics interface](#graphics-interface) (Bitmap Display, 320×240, 8 bits/pixel);
+- [Keyboard interface](#keyboard-interface) (Keyboard and Display MMIO simulator);
 - Animation and movement of player and their attacks;
 - At least 3 levels with different layouts;
 - Colision with walls and enemies
@@ -118,7 +118,7 @@ beqz a7,NORMAL
 The [same tutorial](https://youtu.be/2BBPNgLP6_s) also helped us with the keyboard interface, where the KDMMIO 
 address was loaded and read to see whether the player was giving any input and, afterwards, which key was 
 being pressed. Since the keys are assotiated with ASCII characters, they are case sensitive (_since 'A' is 65 
-and 'a' is 97_). Using a [macro](###about-macros) we quickly made every key check possible, which sent the 
+and 'a' is 97_). Using a [macro](#about-macros) we quickly made every key check possible, which sent the 
 program to an specific label to process that input. The results are as following:
 ```
 ####################      INPUT CHECK       ######################
