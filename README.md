@@ -2,7 +2,7 @@ Para a versão em português, [clique aqui](#the-assembly-gauntlet-português)
 # The-Assembly-Gauntlet
 Project made for the University of Brasilia, Computer Science, Intruduction to Computer Systems
 
-By Luca Megiorin, Eduardo Pereira and Manuella Araujo
+By Luca Heringer Megiorin, Eduardo Pereira de Sousa and Manuella dos Santos Araujo
 - [Context](#context)
 - [Methodology](#methodology)
 - [Conclusion](#conclusion)
@@ -351,7 +351,7 @@ The Assembly Gauntlet wasn't an easy task for a first semester project. Nonethel
 # The Assembly Gauntlet Português
 Projeto feito para a Universidade de Brasília, graduação em Ciências da Computação, matéria de Introdução a Sistemas Computacionais
 
-Feito por Luca Megiorin, Eduardo Pereira e Manuella Araujo
+Feito por Luca Heringer Megiorin, Eduardo Pereira de Sousa e Manuella dos Santos Araujo
 - [Contexto](#contexto)
 - [Metodologia](#metodologia)
 - [Conclusão](#conclusão)
